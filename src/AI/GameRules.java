@@ -17,6 +17,22 @@ public class GameRules {
 		return board[maxPos + 1 + playerNum];
 	}
 	
+	public static int[] scores(int[] board) {
+		int [] scores = new int[3];
+		System.arraycopy(board, maxPos + 1, scores, 0, 3);
+		return scores;
+	}
+	
+	public static int[] pieces(int[] board) {
+		int[] pieces = {0, 0, 0};
+		for (int i = 0; i <= maxPos; i++) {
+			if (board[i] > -1) {
+				pieces[board[i]]++;
+			}
+		}
+		return pieces;
+	}
+	
 	public static void initBoard(int[] board) {
 		for (int i = 0; i <= maxPos; i++) {
 			board[i] = -1;

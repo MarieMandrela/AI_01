@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import AI.GameRules;
 import lenz.htw.aipne.Move;
 
-public class GameTreeAI implements AILogic {
+public class AlphaBetaGameTreeAI implements AILogic {
 	private int[] board;
 	private int playerNum;
 	
@@ -13,7 +13,7 @@ public class GameTreeAI implements AILogic {
 	private int DEPTH = 3;
     private double EPSILON = 0.0;
     
-    public GameTreeAI(int depth, double epislon) {
+    public AlphaBetaGameTreeAI(int depth, double epislon) {
 		this.DEPTH = depth;
 		this.EPSILON = epislon;
 	}
@@ -37,11 +37,19 @@ public class GameTreeAI implements AILogic {
 	public void observeMove(Move move) {
 		this.board = GameRules.applyMove(this.board, move.fromX, move.fromY, move.toX, move.toY);
 	}
+	
+	private void scoreAll(int[] board, int[] score) {
+		int[] pieces = GameRules.pieces(board);
+		int[] scores = GameRules.scores(board);
+		score[0] = scores[0] - Math.max(scores[1], scores[2]) + pieces[0] - Math.max(pieces[1], pieces[2]);
+		score[1] = scores[1] - Math.max(scores[0], scores[2]) + pieces[1] - Math.max(pieces[0], pieces[2]);
+		score[2] = scores[2] - Math.max(scores[1], scores[0]) + pieces[2] - Math.max(pieces[1], pieces[0]);
+	}
 
 	public Move getMove() {
-		int bestScore = Integer.MIN_VALUE;
+		int[] maxScore = {Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
 		int[] moves = new int[MAXMOVELENGTH];
-		int[] bestMove = new int[4];
+		int[] bestMove = {0, 0, 0, 0};
 		
 		GameRules.getAllLegalMovesPlayer(moves, this.board, this.playerNum);
 		
@@ -54,14 +62,14 @@ public class GameTreeAI implements AILogic {
 			
 			int[] nextBoard = GameRules.applyMove(this.board, moves[i+0], moves[i+1], moves[i+2], moves[i+3]);
 			
-			int score = miniMax(nextBoard, this.DEPTH, (this.playerNum + 1) % 2);
-			if (score >= bestScore) {
-				bestScore = score;
+			int[] score = miniMax(nextBoard, this.DEPTH, (this.playerNum + 1) % 2);
+			if (score[this.playerNum] >= maxScore[this.playerNum]) {
+				System.arraycopy(score, 0, maxScore, 0, 3);
 				System.arraycopy(moves, i, bestMove, 0, 4);
 			}
 		}
 		
-		// Get Random move with epislon probability
+		// Get Random move with epsilon probability
 		if (ThreadLocalRandom.current().nextDouble(0,1) < this.EPSILON) {
 			int r = ThreadLocalRandom.current().nextInt(0, i);
 			r = (int)(r/4) * 4;
@@ -72,15 +80,12 @@ public class GameTreeAI implements AILogic {
 		return new Move(bestMove[0], bestMove[1], bestMove[2], bestMove[3]);
 	}
 	
-	private int score(int[] board) {
-		return GameRules.score(board, this.playerNum) - 
-				Math.max(GameRules.score(board, (this.playerNum + 1) % 2), GameRules.score(board, (this.playerNum + 2) % 2));
-	}
-	
-	private int miniMax(int[] board, int depth, int player)
+	private int[] miniMax(int[] board, int depth, int player)
 	{		
+		int[] maxScore = {Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
 		if (depth <= 0) {
-			return score(board);
+			scoreAll(board, maxScore);
+			return maxScore;
 		} 
 		
 		int[] moves = new int[MAXMOVELENGTH];
@@ -88,23 +93,15 @@ public class GameTreeAI implements AILogic {
 		
 		// First move is uninitialized, no legal moves left
 		if (moves[0] == 0 && moves[2] == 0) {
-			return score(board);
-		}
-		
-		int maxScore = 0;
-		if (player == this.playerNum) {
-			maxScore = Integer.MIN_VALUE;
-		} else {
-			maxScore = Integer.MAX_VALUE;
+			scoreAll(board, maxScore);
+			return maxScore;
 		}
 		
 		for (int i = 0; i < MAXMOVELENGTH; i+=4) {
 			int[] nextBoard = GameRules.applyMove(board, moves[i+0], moves[i+1], moves[i+2], moves[i+3]);
-			int score = miniMax(nextBoard, depth -1, (playerNum + 1) % 2);
-			if (player == this.playerNum) {
-				maxScore = score > maxScore ? score : maxScore;
-			} else {
-				maxScore = score < maxScore ? score : maxScore;
+			int[] score = miniMax(nextBoard, depth -1, (playerNum + 1) % 2);
+			if (score[player] > maxScore[player]) {
+				System.arraycopy(score, 0, maxScore, 0, 3);
 			}
 		}
 		
