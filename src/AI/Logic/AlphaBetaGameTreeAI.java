@@ -39,11 +39,12 @@ public class AlphaBetaGameTreeAI implements AILogic {
 	}
 	
 	private void scoreAll(int[] board, int[] score) {
-		int[] pieces = GameRules.pieces(board);
-		int[] scores = GameRules.scores(board);
-		score[0] = scores[0] - Math.max(scores[1], scores[2]) + pieces[0] - Math.max(pieces[1], pieces[2]);
-		score[1] = scores[1] - Math.max(scores[0], scores[2]) + pieces[1] - Math.max(pieces[0], pieces[2]);
-		score[2] = scores[2] - Math.max(scores[1], scores[0]) + pieces[2] - Math.max(pieces[1], pieces[0]);
+		score[0] = GameRules.score(board, 0) - Math.max(GameRules.score(board, 1), GameRules.score(board, 2)) +
+					GameRules.pieces(board, 0) - Math.max(GameRules.pieces(board, 1), GameRules.pieces(board, 2));
+		score[1] = GameRules.score(board, 1) - Math.max(GameRules.score(board, 0), GameRules.score(board, 2)) +
+				GameRules.pieces(board, 1) - Math.max(GameRules.pieces(board, 0), GameRules.pieces(board, 2));
+		score[2] = GameRules.score(board, 2) - Math.max(GameRules.score(board, 1), GameRules.score(board, 0)) +
+				GameRules.pieces(board, 2) - Math.max(GameRules.pieces(board, 1), GameRules.pieces(board, 0));
 	}
 
 	public Move getMove() {
@@ -91,17 +92,14 @@ public class AlphaBetaGameTreeAI implements AILogic {
 		int[] moves = new int[MAXMOVELENGTH];
 		GameRules.getAllLegalMovesPlayer(moves, board, player);
 		
-		// First move is uninitialized, no legal moves left
-		if (moves[0] == 0 && moves[2] == 0) {
-			scoreAll(board, maxScore);
-			return maxScore;
-		}
-		
 		for (int i = 0; i < MAXMOVELENGTH; i+=4) {
 			int[] nextBoard = GameRules.applyMove(board, moves[i+0], moves[i+1], moves[i+2], moves[i+3]);
 			int[] score = miniMax(nextBoard, depth -1, (playerNum + 1) % 2);
 			if (score[player] > maxScore[player]) {
 				System.arraycopy(score, 0, maxScore, 0, 3);
+			}
+			if (moves[i+0] == 0 && moves[i+2] == 0) {
+				break;
 			}
 		}
 		

@@ -86,11 +86,6 @@ public class GameTreeAI implements AILogic {
 		int[] moves = new int[MAXMOVELENGTH];
 		GameRules.getAllLegalMovesPlayer(moves, board, player);
 		
-		// First move is uninitialized, no legal moves left
-		if (moves[0] == 0 && moves[2] == 0) {
-			return score(board);
-		}
-		
 		int maxScore = 0;
 		if (player == this.playerNum) {
 			maxScore = Integer.MIN_VALUE;
@@ -105,6 +100,9 @@ public class GameTreeAI implements AILogic {
 				maxScore = score > maxScore ? score : maxScore;
 			} else {
 				maxScore = score < maxScore ? score : maxScore;
+			}
+			if (moves[i+0] == 0 && moves[i+2] == 0) {
+				break;
 			}
 		}
 		

@@ -4,7 +4,7 @@ public class GameRules {
 	static int width = 14;
 	static int height = 7;
 	static int maxPos = height*height + width;
-	static int arraySize = maxPos + 1 + 3;
+	static int arraySize = maxPos + 1 + 3 + 3;
 	
 	public static void initAllPlayers(int[] board)
 	{
@@ -17,20 +17,8 @@ public class GameRules {
 		return board[maxPos + 1 + playerNum];
 	}
 	
-	public static int[] scores(int[] board) {
-		int [] scores = new int[3];
-		System.arraycopy(board, maxPos + 1, scores, 0, 3);
-		return scores;
-	}
-	
-	public static int[] pieces(int[] board) {
-		int[] pieces = {0, 0, 0};
-		for (int i = 0; i <= maxPos; i++) {
-			if (board[i] > -1) {
-				pieces[board[i]]++;
-			}
-		}
-		return pieces;
+	public static int pieces(int[] board, int playerNum) {
+		return board[maxPos + 3 + 1 + playerNum];
 	}
 	
 	public static void initBoard(int[] board) {
@@ -40,6 +28,9 @@ public class GameRules {
 		board[maxPos + 1] = 0;
 		board[maxPos + 2] = 0;
 		board[maxPos + 3] = 0;
+		board[maxPos + 4] = 8;
+		board[maxPos + 5] = 8;
+		board[maxPos + 6] = 8;
 	}
 	
 	private static void initPlayerZero(int[] board)	{
@@ -103,6 +94,7 @@ public class GameRules {
 		}
 		else if (board[toY*toY + toX] != -1) {
 			board[maxPos + 1 + activePlayer] += 1;
+			board[maxPos + 3 + 1 + board[toY*toY + toX]] -= 1;
 		}
 	}
 	
