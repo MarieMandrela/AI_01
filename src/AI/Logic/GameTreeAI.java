@@ -54,7 +54,7 @@ public class GameTreeAI implements AILogic {
 			
 			int[] nextBoard = GameRules.applyMove(this.board, moves[i+0], moves[i+1], moves[i+2], moves[i+3]);
 			
-			int score = miniMax(nextBoard, this.DEPTH, (this.playerNum + 1) % 2);
+			int score = miniMax(nextBoard, this.DEPTH -1, (this.playerNum + 1) % 2);
 			if (score >= bestScore) {
 				bestScore = score;
 				System.arraycopy(moves, i, bestMove, 0, 4);

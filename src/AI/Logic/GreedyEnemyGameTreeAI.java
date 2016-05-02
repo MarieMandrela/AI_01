@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import AI.GameRules;
 import lenz.htw.aipne.Move;
 
-public class AlphaBetaGameTreeAI implements AILogic {
+public class GreedyEnemyGameTreeAI implements AILogic {
 	private int[] board;
 	private int playerNum;
 	
@@ -13,7 +13,7 @@ public class AlphaBetaGameTreeAI implements AILogic {
 	private int DEPTH = 3;
     private double EPSILON = 0.0;
     
-    public AlphaBetaGameTreeAI(int depth, double epislon) {
+    public GreedyEnemyGameTreeAI(int depth, double epislon) {
 		this.DEPTH = depth;
 		this.EPSILON = epislon;
 	}
@@ -63,7 +63,7 @@ public class AlphaBetaGameTreeAI implements AILogic {
 			
 			int[] nextBoard = GameRules.applyMove(this.board, moves[i+0], moves[i+1], moves[i+2], moves[i+3]);
 			
-			int[] score = miniMax(nextBoard, this.DEPTH, (this.playerNum + 1) % 2);
+			int[] score = miniMax(nextBoard, this.DEPTH -1, (this.playerNum + 1) % 2);
 			if (score[this.playerNum] >= maxScore[this.playerNum]) {
 				System.arraycopy(score, 0, maxScore, 0, 3);
 				System.arraycopy(moves, i, bestMove, 0, 4);

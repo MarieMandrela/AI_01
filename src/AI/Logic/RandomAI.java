@@ -32,14 +32,12 @@ public class RandomAI implements AILogic {
 		for (; i < maxMoveLength; i+=4) {
 			// Uninitialized move, reached end of possible moves 
 			if (moves[i+0] == 0 && moves[i+2] == 0) {
-				System.out.println("Random Player found " + i/4 + " moves");
 				break;
 			}
 		}
 		
 		int r = ThreadLocalRandom.current().nextInt(0, i);
 		r = (int)(r/4) * 4;
-		System.out.println("Random Player taking " + r/4 + "th move");
 		bestMove[0] = moves[r+0];
 		bestMove[1] = moves[r+1];
 		bestMove[2] = moves[r+2];
