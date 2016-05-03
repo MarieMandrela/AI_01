@@ -61,11 +61,10 @@ public class GameTreeAI implements AILogic {
 			}
 		}
 		
-		// Get Random move with epislon probability
+		// Get Random move with epsilon probability
 		if (ThreadLocalRandom.current().nextDouble(0,1) < this.EPSILON) {
 			int r = ThreadLocalRandom.current().nextInt(0, i);
 			r = (int)(r/4) * 4;
-			System.out.println("Random Player taking " + r/4 + "th move");
 			System.arraycopy(moves, r, bestMove, 0, 4);
 		}
 		
@@ -74,7 +73,9 @@ public class GameTreeAI implements AILogic {
 	
 	private int score(int[] board) {
 		return GameRules.score(board, this.playerNum) - 
-				Math.max(GameRules.score(board, (this.playerNum + 1) % 2), GameRules.score(board, (this.playerNum + 2) % 2));
+				Math.max(GameRules.score(board, (this.playerNum + 1) % 2), GameRules.score(board, (this.playerNum + 2) % 2)) +
+				GameRules.pieces(board, this.playerNum) - 
+				Math.max(GameRules.pieces(board, (this.playerNum + 1 % 2)), GameRules.pieces(board, (this.playerNum + 2 % 2)));
 	}
 	
 	private int miniMax(int[] board, int depth, int player)

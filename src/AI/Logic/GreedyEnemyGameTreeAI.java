@@ -74,7 +74,6 @@ public class GreedyEnemyGameTreeAI implements AILogic {
 		if (ThreadLocalRandom.current().nextDouble(0,1) < this.EPSILON) {
 			int r = ThreadLocalRandom.current().nextInt(0, i);
 			r = (int)(r/4) * 4;
-			System.out.println("Random Player taking " + r/4 + "th move");
 			System.arraycopy(moves, r, bestMove, 0, 4);
 		}
 		
