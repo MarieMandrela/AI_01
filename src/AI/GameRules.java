@@ -4,7 +4,10 @@ public class GameRules {
 	static int width = 14;
 	static int height = 7;
 	static int maxPos = height*height + width;
-	static int arraySize = maxPos + 1 + 3 + 3;
+	static int scorePos = maxPos + 1;
+	static int piecesPos = scorePos + 3;
+	static int inGamePos = piecesPos + 3;
+	static int arraySize = inGamePos + 3;
 	
 	public static void initAllPlayers(int[] board)
 	{
@@ -14,23 +17,36 @@ public class GameRules {
 	}
 	
 	public static int score(int[] board, int playerNum) {
-		return board[maxPos + 1 + playerNum];
+		return board[scorePos + playerNum];
 	}
 	
 	public static int pieces(int[] board, int playerNum) {
-		return board[maxPos + 3 + 1 + playerNum];
+		return board[piecesPos + playerNum];
+	}
+	
+	public static boolean inGame(int[] board, int playerNum) {
+		return board[inGamePos + playerNum] == 1;
+	}
+	
+	public static int unevenPieces(int[] board, int playerNum) {
+		// TODO keep track of and return here
+		return 0;
 	}
 	
 	public static void initBoard(int[] board) {
 		for (int i = 0; i <= maxPos; i++) {
 			board[i] = -1;
 		}
-		board[maxPos + 1] = 0;
-		board[maxPos + 2] = 0;
-		board[maxPos + 3] = 0;
-		board[maxPos + 4] = 8;
-		board[maxPos + 5] = 8;
-		board[maxPos + 6] = 8;
+		
+		board[scorePos + 0] = 0;
+		board[scorePos + 1] = 0;
+		board[scorePos + 2] = 0;
+		board[piecesPos + 0] = 8;
+		board[piecesPos + 1] = 8;
+		board[piecesPos + 2] = 8;
+		board[inGamePos + 0] = 1;
+		board[inGamePos + 1] = 1;
+		board[inGamePos + 2] = 1;
 	}
 	
 	private static void initPlayerZero(int[] board)	{
@@ -76,7 +92,7 @@ public class GameRules {
 		
 		int activePlayer = board[fromY*fromY + fromX];
 		
-		scoreMove(board, fromX, fromY, toX, toY, activePlayer);
+		scoreMove(applied, fromX, fromY, toX, toY, activePlayer);
 		
 		applied[fromY*fromY + fromX] = -1;
 		applied[toY*toY + toX] = activePlayer;
@@ -84,17 +100,26 @@ public class GameRules {
 		return applied;
 	}
 	
+	public static int[] applyNoMove(int[] board, int activePlayer) {
+		int[] applied = new int[arraySize];
+		System.arraycopy(board, 0, applied, 0, arraySize);
+		
+		applied[inGamePos + activePlayer] = 0;
+		
+		return applied;
+	}
+	
 	private static void scoreMove(int[] board, int fromX, int fromY, int toX, int toY, int activePlayer) {
 		
 		if (isInOppositeCorner(toX, toY, activePlayer)) {
-			board[maxPos + 1 + activePlayer] += 11;
+			board[scorePos + activePlayer] += 11;
 		}
 		else if (fromX % 2 != 0) {
-			board[maxPos + 1 + activePlayer] += 1;
+			board[scorePos + activePlayer] += 1;
 		}
 		else if (board[toY*toY + toX] != -1) {
-			board[maxPos + 1 + activePlayer] += 1;
-			board[maxPos + 3 + 1 + board[toY*toY + toX]] -= 1;
+			board[scorePos + activePlayer] += 1;
+			board[piecesPos + board[toY*toY + toX]] -= 1;
 		}
 	}
 	
@@ -132,8 +157,11 @@ public class GameRules {
 	}
 	
 	public static int[] getAllLegalMovesPlayer(int[] moves, int[] board, int playerNum) {
-		int pos = 0;
+		if (!inGame(board, playerNum)) {
+			return moves;
+		}
 		
+		int pos = 0;
 		for (int y = 0; y <= height; y++) {
 			for (int x = 0; x <= 2*y; x++) {
 				if (board[y*y + x] == playerNum) {

@@ -36,6 +36,11 @@ public class RandomAI implements AILogic {
 			}
 		}
 		
+		// No Moves left
+		if (moves[0] == 0 && moves[2] == 0) {
+			return new Move(bestMove[0], bestMove[1], bestMove[2], bestMove[3]);
+		}
+		
 		int r = ThreadLocalRandom.current().nextInt(0, i);
 		r = (int)(r/4) * 4;
 		bestMove[0] = moves[r+0];
