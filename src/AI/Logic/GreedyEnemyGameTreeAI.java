@@ -87,6 +87,13 @@ public class GreedyEnemyGameTreeAI implements AILogic {
 		int[] moves = new int[MAXMOVELENGTH];
 		GameRules.getAllLegalMovesPlayer(moves, board, player);
 		
+		// No legal moves for that player
+		if (moves[0] == 0 && moves[2] == 0) {
+			int[] nextBoard = GameRules.applyNoMove(board, playerNum);
+			int[] score = miniMax(nextBoard, depth -1, (playerNum + 1) % 2);
+			return score;
+		}
+		
 		for (int i = 0; i < MAXMOVELENGTH; i+=4) {
 			if (moves[i+0] == 0 && moves[i+2] == 0) {
 				break;
